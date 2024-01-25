@@ -1,0 +1,142 @@
+[File]
+        DescText = "{{ .DescText }}";
+        CreateDate = {{ .CreateTime.Format "01-02-2006" }};
+        CreateTime = {{ .CreateTime.Format "03:04:05" }};
+        ModDate = {{ .ModificationTime.Format "01-02-2006" }};
+        ModTime = {{ .ModificationTime.Format "03:04:05" }};
+        Revision = {{ .FileSection.Revision.String }};
+        HomeURL = "{{ .HomeURL.String }}";
+
+
+[Device]
+        VendCode = {{ .Identity.VendorID }};
+        VendName = "{{ .VendorName }}";
+        ProdType = {{ .Identity.DeviceType }};
+        ProdTypeStr = "{{ .ProductType }}";
+        ProdCode = {{ .Identity.ProductCode }};
+        MajRev = {{ .Identity.Revision.Major }};
+        MinRev = {{ .Identity.Revision.Minor }};
+        ProdName = "{{ .Identity.ProductName }}";
+        Catalog = "{{ .Identity.ProductName }}";
+
+
+[Device Classification]
+        Class1 = EtherNetIP;
+
+[Params]
+{{- range $i, $p := .ParamList }}
+        Param{{ $p.Index }} =
+                0, $ reserved (0)
+                ,, $ link path size, link path
+                0x0000, $ descripto
+                {{ $p.DataType.CodeString }}, $ data type ({{ $p.DataType.String }})
+                {{ $p.DataType.Size }}, $ data size (bytes)
+                "{{ $p.Name }}", $ name
+                "{{ $p.UnitsString }}", $ units
+                "{{ $p.HelpString }}", $ help string
+                {{ $p.MinString }}, $ min
+                {{ $p.MaxString }}, $ max
+                {{ $p.GetDefaultValueString }}, $ default value 
+                ,,,, $ mult, div, base, offset scaling
+                ,,,, $ mult, div, base, offset links
+                ; $ decimal places
+{{- end }}
+
+{{- if (len .AssemblyList) }}
+$ See Volume 1: 7-3.6.8
+[Assembly]
+    Revision = {{ (.AssemblyClass).Revision }};
+    Object_Name = "Assembly Object";
+    Object_Class_Code = 0x04;
+    MaxInst = {{ (.AssemblyClass).HighestInstanceID }};
+    Number_Of_Static_Instances = {{ (len .AssemblyList) }};
+    {{- range $i, $inst := .AssemblyList }}
+    Assem{{ $inst.InstanceID }} = 
+      "{{ $inst.Name }}", $ name
+      "", $ path
+      {{ $inst.GetSize }}, $ size (bytes)
+      0x0000, $ descriptor
+      , $ reserved 1
+      {{- if (len $inst.Parameters) }}
+      , $ reserved 2
+      {{- end }}
+      {{- range $j, $param := $inst.Parameters }}
+      $ {{ $param.Name }}
+      {{ $param.SizeBits }}, Param{{ $param.Index }}
+      {{- if (ne (add $j 1) (len $inst.Parameters)) }},{{- end }}
+      {{- end }}
+      ;
+    {{- end }}
+{{ end }}
+
+[Capacity]
+        MaxMsgConnections = 6;
+        MaxIOProduceConsume = 2;
+        MaxIOMcastProducers = 1;
+        MaxIOMcastConsumers = 1;
+        MaxConsumersPerMcast = 6;
+        TSpec1 = TxRx, 32, 100;
+
+{{ if .ConnectionManagerClass }}
+{{ $c := .ConnectionManagerClass }}
+$ Connection Manager: Volume 1: 7-3.6.10
+[Connection Manager]
+        Revision = {{ $c.Revision }};
+        Object_Name = "{{ $c.Name }} Object";
+        Object_Class_Code = {{ $c.ClassCodeHex }};
+        MaxInst = {{ $c.HighestInstanceID }};
+        Number_Of_Static_Instances = {{ $c.NumberOfInstances }};
+        Max_Number_Of_Dynamic_Instances = 0;
+        {{- range $i, $cp := .Adapter.ConnectionPoints }}
+        Connection{{ (add $i 1) }} =
+          $ trigger and transport mask (Volume 1: 7-3.6.10.1.1)
+          {{ $cp.TriggerAndTransportMaskString }},
+          $ connection parameters (Volume 1: 7-3.6.10.1.2)
+          {{ $cp.ConnectionParametersString }},
+          $ OtoT RPI
+          Param{{ $.RPI.Index }},
+          $ OtoT size
+          {{ $cp.Output.GetSize }},
+          $ OtoT format
+          Assem{{ $cp.Output.InstanceID }},
+          $ TtoO RPI
+          Param{{ $.RPI.Index }},
+          $ TtoO size
+          {{ $cp.Input.GetSize }},
+          $ TtoO format
+          Assem{{ $cp.Input.InstanceID }},
+          $ config 1 size
+          ,
+          $ config 1 format
+          ,
+          {{- if $cp.Config }}
+          $ config 2 size
+          ,
+          $ config 2 format
+          Assem{{ $cp.Config.InstanceID }},
+          {{- else }}
+          $ config 2 size
+          0,
+          $ config 2 format
+          ,
+          {{- end }}
+          $ connection name
+          "{{ $cp.Name }}",
+          $ help string
+          "",
+          $ path
+          "{{ $cp.ConnectionPathString }}"
+        ;
+      {{- end }}
+{{ end }}
+
+{{- range $i, $c := .StandardClasses }}
+[{{ $c.Name }} Class]
+        Revision = {{ $c.Revision }};
+        Object_Name = "{{ $c.Name }} Object";
+        Object_Class_Code = {{ $c.ClassCodeHex }};
+        MaxInst = {{ $c.HighestInstanceID }};
+        Number_Of_Static_Instances = {{ $c.NumberOfInstances }};
+        Max_Number_Of_Dynamic_Instances = 0;
+{{ end }}
+
