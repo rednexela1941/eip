@@ -64,6 +64,9 @@ var (
 	WORD  = NewDataType(WORDCode, cip.WORDSize)
 	DWORD = NewDataType(DWORDCode, cip.DWORDSize)
 	LWORD = NewDataType(LWORDCode, cip.LWORDSize)
+
+	REAL  = NewDataType(REALCode, cip.REALSize)
+	LREAL = NewDataType(LREALCode, cip.LREALSize)
 )
 
 func NewDataType(code DataTypeCode, size int) DataType {

@@ -20,6 +20,9 @@ my @types = qw(
   WORD
   DWORD
   LWORD
+
+  REAL
+  LREAL
 );
 
 say "param.go Functions:";

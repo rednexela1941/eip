@@ -45,28 +45,28 @@
 {{ if (len .AssemblyList) }}
 $ See Volume 1: 7-3.6.8
 [Assembly]
-    Revision = {{ (.AssemblyClass).Revision }};
-    Object_Name = "Assembly Object";
-    Object_Class_Code = 0x04;
-    MaxInst = {{ (.AssemblyClass).HighestInstanceID }};
-    Number_Of_Static_Instances = {{ (len .AssemblyList) }};
-    {{- range $i, $inst := .AssemblyList }}
-    Assem{{ $inst.InstanceID }} = 
-      "{{ $inst.Name }}", $ name
-      "", $ path
-      {{ $inst.GetSize }}, $ size (bytes)
-      0x0000, $ descriptor
-      , $ reserved 1
-      {{- if (len $inst.Parameters) }}
-      , $ reserved 2
-      {{- end }}
-      {{- range $j, $param := $inst.Parameters }}
-      $ {{ $param.Name }}
-      {{ $param.SizeBits }}, Param{{ $param.Index }}
-      {{- if (ne (add $j 1) (len $inst.Parameters)) }},{{- end }}
-      {{- end }}
-      ;
-    {{- end }}
+        Revision = {{ (.AssemblyClass).Revision }};
+        Object_Name = "Assembly Object";
+        Object_Class_Code = 0x04;
+        MaxInst = {{ (.AssemblyClass).HighestInstanceID }};
+        Number_Of_Static_Instances = {{ (len .AssemblyList) }};
+        {{- range $i, $inst := .AssemblyList }}
+        Assem{{ $inst.InstanceID }} = 
+          "{{ $inst.Name }}", $ name
+          "", $ path
+          {{ $inst.GetSize }}, $ size (bytes)
+          0x0000, $ descriptor
+          , $ reserved 1
+          {{- if (len $inst.Parameters) }}
+          , $ reserved 2
+          {{- end }}
+          {{- range $j, $param := $inst.Parameters }}
+          $ {{ $param.Name }}
+          {{ $param.SizeBits }}, Param{{ $param.Index }}
+          {{- if (ne (add $j 1) (len $inst.Parameters)) }},{{- end }}
+          {{- end }}
+          ;
+        {{- end }}
 {{ end }}
 
 [Capacity]

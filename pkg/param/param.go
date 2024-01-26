@@ -155,3 +155,11 @@ func NewDWORDParam(name string) *AssemblyParam {
 func NewLWORDParam(name string) *AssemblyParam {
 	return _NewDefaultParam(name, LWORD)
 }
+
+func NewREALParam(name string) *AssemblyParam {
+	return _NewDefaultParam(name, REAL)
+}
+
+func NewLREALParam(name string) *AssemblyParam {
+	return _NewDefaultParam(name, LREAL)
+}

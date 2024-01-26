@@ -271,3 +271,15 @@ func (self *AssemblyInstance) AddLWORDParam(name string) *param.AssemblyParam {
 	self.AddParam(p)
 	return p
 }
+
+func (self *AssemblyInstance) AddREALParam(name string) *param.AssemblyParam {
+	p := param.NewREALParam(name)
+	self.AddParam(p)
+	return p
+}
+
+func (self *AssemblyInstance) AddLREALParam(name string) *param.AssemblyParam {
+	p := param.NewLREALParam(name)
+	self.AddParam(p)
+	return p
+}
