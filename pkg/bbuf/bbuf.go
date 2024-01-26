@@ -16,6 +16,7 @@ type (
 		Rl(interface{}) // read little-endian from buffer to interface.
 		Rb(interface{}) // read big-endian from buffer to interface.
 		Read([]byte) (int, error)
+		Len() int
 	}
 
 	Writer interface {

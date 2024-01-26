@@ -103,8 +103,21 @@ func (self *AssemblyInstance) handleGet(res Response) {
 
 func (self *AssemblyInstance) ReadFrom(r bbuf.Reader) error {
 	for _, p := range self.Parameters {
+		startLen := r.Len()
 		if err := p.ReadFrom(r); err != nil {
 			return err
+		}
+		if r.Error() != nil {
+			return r.Error()
+		}
+		endLen := r.Len()
+		diff := startLen - endLen
+		if diff != int(p.DataType.Size) {
+			return fmt.Errorf(
+				"read wrong amount of bytes for param %s (read %d need %d)",
+				diff,
+				p.DataType.Size,
+			)
 		}
 	}
 	return nil
@@ -112,8 +125,20 @@ func (self *AssemblyInstance) ReadFrom(r bbuf.Reader) error {
 
 func (self *AssemblyInstance) WriteTo(w bbuf.Writer) error {
 	for _, p := range self.Parameters {
+		startLen := w.Len()
 		if err := p.WriteTo(w); err != nil {
 			return err
+		}
+		if w.Error() != nil {
+			return w.Error()
+		}
+		endLen := w.Len()
+		diff := endLen - startLen
+		if diff != int(p.DataType.Size) {
+			return fmt.Errorf(
+				"wrote wrong amount of bytes for param %s (need %d got %d)",
+				p.Name, p.DataType.Size, diff,
+			)
 		}
 	}
 	return nil
