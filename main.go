@@ -15,10 +15,18 @@ const (
 )
 
 func main() {
+	helpFlag := flag.Bool("h", false, "print help")
 	edsFlag := flag.Bool("eds", false, "print generated eds file to stdout")
+	ifaceNameFlag := flag.String("iface", MyNetworkInterfaceName, "name of the network interface to listen on")
+
 	flag.Parse()
 
-	iface, err := linux.CreateInterface(MyNetworkInterfaceName)
+	if *helpFlag {
+		flag.Usage()
+		return
+	}
+
+	iface, err := linux.CreateInterface(*ifaceNameFlag)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/url"
 	"sort"
+	"text/tabwriter"
 	"text/template"
 	"time"
 
@@ -96,7 +97,13 @@ func WriteEDS(w io.Writer, a *adapter.Adapter, init FileInitFunc) error {
 
 	data.init()
 
-	return tmpl.Execute(w, data)
+	tabWriter := tabwriter.NewWriter(w, 4, 0, 1, ' ', 0)
+
+	if err := tmpl.Execute(tabWriter, data); err != nil {
+		return err
+	}
+
+	return tabWriter.Flush()
 }
 
 /***
