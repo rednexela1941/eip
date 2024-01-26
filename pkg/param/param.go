@@ -25,9 +25,12 @@ type AssemblyParam struct {
 	DefaultValueString string
 
 	// Default Required
-	onGet func(w bbuf.Writer) error
-	onSet func(r bbuf.Reader) error
+	onGet OnGetFunc
+	onSet OnSetFunc
 }
+
+type OnGetFunc func(w bbuf.Writer) error
+type OnSetFunc func(r bbuf.Reader) error
 
 // WriteTo: for Get data (both IO connections and Get Attribute services).
 func (self *AssemblyParam) WriteTo(w bbuf.Writer) error {
@@ -84,69 +87,71 @@ func (self *AssemblyParam) GetDefaultValueString() string {
 	return self.DefaultValueString
 }
 
-func _NewDefaultParam(name string, dataType DataType, ptr any) *AssemblyParam {
+func _NewDefaultParam(name string, dataType DataType) *AssemblyParam {
 	return &AssemblyParam{
 		Name:     name,
 		DataType: dataType,
-		onGet: func(w bbuf.Writer) error {
-			w.Wl(ptr)
-			return w.Error()
-		},
-		onSet: func(r bbuf.Reader) error {
-			r.Rl(ptr)
-			return r.Error()
-		},
 	}
 }
 
-func NewBOOLParam(name string, ptr *cip.BOOL) *AssemblyParam {
-	return _NewDefaultParam(name, BOOL, ptr)
+func (self *AssemblyParam) OnGet(fn OnGetFunc) *AssemblyParam {
+	self.onGet = fn
+	return self
 }
 
-func NewSINTParam(name string, ptr *cip.SINT) *AssemblyParam {
-	return _NewDefaultParam(name, SINT, ptr)
+func (self *AssemblyParam) OnSet(fn OnSetFunc) *AssemblyParam {
+	self.onSet = fn
+	return self
 }
 
-func NewINTParam(name string, ptr *cip.INT) *AssemblyParam {
-	return _NewDefaultParam(name, INT, ptr)
+func NewBOOLParam(name string) *AssemblyParam {
+	return _NewDefaultParam(name, BOOL)
 }
 
-func NewDINTParam(name string, ptr *cip.DINT) *AssemblyParam {
-	return _NewDefaultParam(name, DINT, ptr)
+func NewSINTParam(name string) *AssemblyParam {
+	return _NewDefaultParam(name, SINT)
 }
 
-func NewLINTParam(name string, ptr *cip.LINT) *AssemblyParam {
-	return _NewDefaultParam(name, LINT, ptr)
+func NewINTParam(name string) *AssemblyParam {
+	return _NewDefaultParam(name, INT)
 }
 
-func NewUSINTParam(name string, ptr *cip.USINT) *AssemblyParam {
-	return _NewDefaultParam(name, USINT, ptr)
+func NewDINTParam(name string) *AssemblyParam {
+	return _NewDefaultParam(name, DINT)
 }
 
-func NewUINTParam(name string, ptr *cip.UINT) *AssemblyParam {
-	return _NewDefaultParam(name, UINT, ptr)
+func NewLINTParam(name string) *AssemblyParam {
+	return _NewDefaultParam(name, LINT)
 }
 
-func NewUDINTParam(name string, ptr *cip.UDINT) *AssemblyParam {
-	return _NewDefaultParam(name, UDINT, ptr)
+func NewUSINTParam(name string) *AssemblyParam {
+	return _NewDefaultParam(name, USINT)
 }
 
-func NewULINTParam(name string, ptr *cip.ULINT) *AssemblyParam {
-	return _NewDefaultParam(name, ULINT, ptr)
+func NewUINTParam(name string) *AssemblyParam {
+	return _NewDefaultParam(name, UINT)
 }
 
-func NewBYTEParam(name string, ptr *cip.BYTE) *AssemblyParam {
-	return _NewDefaultParam(name, BYTE, ptr)
+func NewUDINTParam(name string) *AssemblyParam {
+	return _NewDefaultParam(name, UDINT)
 }
 
-func NewWORDParam(name string, ptr *cip.WORD) *AssemblyParam {
-	return _NewDefaultParam(name, WORD, ptr)
+func NewULINTParam(name string) *AssemblyParam {
+	return _NewDefaultParam(name, ULINT)
 }
 
-func NewDWORDParam(name string, ptr *cip.DWORD) *AssemblyParam {
-	return _NewDefaultParam(name, DWORD, ptr)
+func NewBYTEParam(name string) *AssemblyParam {
+	return _NewDefaultParam(name, BYTE)
 }
 
-func NewLWORDParam(name string, ptr *cip.LWORD) *AssemblyParam {
-	return _NewDefaultParam(name, LWORD, ptr)
+func NewWORDParam(name string) *AssemblyParam {
+	return _NewDefaultParam(name, WORD)
+}
+
+func NewDWORDParam(name string) *AssemblyParam {
+	return _NewDefaultParam(name, DWORD)
+}
+
+func NewLWORDParam(name string) *AssemblyParam {
+	return _NewDefaultParam(name, LWORD)
 }

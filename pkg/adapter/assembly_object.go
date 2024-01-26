@@ -159,8 +159,9 @@ func (self *AssemblyInstance) CheckParamAlignment() error {
 	offset := 0
 	for _, p := range self.Parameters {
 		size := int(p.DataType.Size)
-		if offset%size != 0 {
-			return fmt.Errorf("%s is not aligned (offset %d bytes)", p.Name, offset)
+		mod := offset % size
+		if mod != 0 {
+			return fmt.Errorf("%s is not aligned (to fix add %d pad bytes)", p.Name, mod)
 		}
 		offset += size
 	}
@@ -175,89 +176,98 @@ func (self *AssemblyInstance) AddParam(p *param.AssemblyParam) {
 	}
 	// this loop is a bit repetitice.
 	if err := self.CheckParamAlignment(); err != nil {
-		log.Println("Warn", err)
+		log.Fatal(err)
 	}
 }
 
 // Add a pad byte parameter
 func (self *AssemblyInstance) AddPadByteParam() {
-	self.AddUSINTParam("Padding", new(cip.USINT))
+	self.AddUSINTParam("Padding").OnGet(
+		func(w bbuf.Writer) error {
+			w.Wl(cip.USINT(0))
+			return w.Error()
+		}).OnSet(
+		func(r bbuf.Reader) error {
+			var dummy cip.USINT
+			r.Rl(&dummy)
+			return r.Error()
+		})
 }
 
-func (self *AssemblyInstance) AddBOOLParam(name string, ptr *cip.BOOL) *param.AssemblyParam {
-	p := param.NewBOOLParam(name, ptr)
+func (self *AssemblyInstance) AddBOOLParam(name string) *param.AssemblyParam {
+	p := param.NewBOOLParam(name)
 	self.AddParam(p)
 	return p
 }
 
-func (self *AssemblyInstance) AddSINTParam(name string, ptr *cip.SINT) *param.AssemblyParam {
-	p := param.NewSINTParam(name, ptr)
+func (self *AssemblyInstance) AddSINTParam(name string) *param.AssemblyParam {
+	p := param.NewSINTParam(name)
 	self.AddParam(p)
 	return p
 }
 
-func (self *AssemblyInstance) AddINTParam(name string, ptr *cip.INT) *param.AssemblyParam {
-	p := param.NewINTParam(name, ptr)
+func (self *AssemblyInstance) AddINTParam(name string) *param.AssemblyParam {
+	p := param.NewINTParam(name)
 	self.AddParam(p)
 	return p
 }
 
-func (self *AssemblyInstance) AddDINTParam(name string, ptr *cip.DINT) *param.AssemblyParam {
-	p := param.NewDINTParam(name, ptr)
+func (self *AssemblyInstance) AddDINTParam(name string) *param.AssemblyParam {
+	p := param.NewDINTParam(name)
 	self.AddParam(p)
 	return p
 }
 
-func (self *AssemblyInstance) AddLINTParam(name string, ptr *cip.LINT) *param.AssemblyParam {
-	p := param.NewLINTParam(name, ptr)
+func (self *AssemblyInstance) AddLINTParam(name string) *param.AssemblyParam {
+	p := param.NewLINTParam(name)
 	self.AddParam(p)
 	return p
 }
 
-func (self *AssemblyInstance) AddUSINTParam(name string, ptr *cip.USINT) *param.AssemblyParam {
-	p := param.NewUSINTParam(name, ptr)
+func (self *AssemblyInstance) AddUSINTParam(name string) *param.AssemblyParam {
+	p := param.NewUSINTParam(name)
 	self.AddParam(p)
 	return p
 }
 
-func (self *AssemblyInstance) AddUINTParam(name string, ptr *cip.UINT) *param.AssemblyParam {
-	p := param.NewUINTParam(name, ptr)
+func (self *AssemblyInstance) AddUINTParam(name string) *param.AssemblyParam {
+	p := param.NewUINTParam(name)
 	self.AddParam(p)
 	return p
 }
 
-func (self *AssemblyInstance) AddUDINTParam(name string, ptr *cip.UDINT) *param.AssemblyParam {
-	p := param.NewUDINTParam(name, ptr)
+func (self *AssemblyInstance) AddUDINTParam(name string) *param.AssemblyParam {
+	p := param.NewUDINTParam(name)
 	self.AddParam(p)
 	return p
 }
 
-func (self *AssemblyInstance) AddULINTParam(name string, ptr *cip.ULINT) *param.AssemblyParam {
-	p := param.NewULINTParam(name, ptr)
+func (self *AssemblyInstance) AddULINTParam(name string) *param.AssemblyParam {
+	p := param.NewULINTParam(name)
 	self.AddParam(p)
 	return p
 }
 
-func (self *AssemblyInstance) AddBYTEParam(name string, ptr *cip.BYTE) *param.AssemblyParam {
-	p := param.NewBYTEParam(name, ptr)
+func (self *AssemblyInstance) AddBYTEParam(name string) *param.AssemblyParam {
+	p := param.NewBYTEParam(name)
 	self.AddParam(p)
 	return p
 }
 
-func (self *AssemblyInstance) AddWORDParam(name string, ptr *cip.WORD) *param.AssemblyParam {
-	p := param.NewWORDParam(name, ptr)
+func (self *AssemblyInstance) AddWORDParam(name string) *param.AssemblyParam {
+	p := param.NewWORDParam(name)
 	self.AddParam(p)
 	return p
 }
 
-func (self *AssemblyInstance) AddDWORDParam(name string, ptr *cip.DWORD) *param.AssemblyParam {
-	p := param.NewDWORDParam(name, ptr)
+func (self *AssemblyInstance) AddDWORDParam(name string) *param.AssemblyParam {
+	p := param.NewDWORDParam(name)
 	self.AddParam(p)
 	return p
 }
 
-func (self *AssemblyInstance) AddLWORDParam(name string, ptr *cip.LWORD) *param.AssemblyParam {
-	p := param.NewLWORDParam(name, ptr)
+func (self *AssemblyInstance) AddLWORDParam(name string) *param.AssemblyParam {
+	p := param.NewLWORDParam(name)
 	self.AddParam(p)
 	return p
 }

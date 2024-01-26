@@ -13,7 +13,7 @@ import (
 )
 
 func (self *_Adapter) _ValidRPI(t time.Duration) bool {
-	return t > 0 && t >= self.networkTickInterval
+	return t > 0 && t >= self.NetworkTickInterval
 }
 
 func (self *_Adapter) CheckRPI(freq *cm.SharedForwardOpenRequest, res Response) bool {

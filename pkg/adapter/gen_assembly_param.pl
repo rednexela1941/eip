@@ -22,20 +22,22 @@ my @types = qw(
   LWORD
 );
 
+say "param.go Functions:";
 foreach (@types)
 {
     say <<HERE;
-func New${_}Param(name string, ptr *cip.$_) *AssemblyParam {
-	return _NewDefaultParam(name, $_, ptr)
+func New${_}Param(name string) *AssemblyParam {
+	return _NewDefaultParam(name, $_)
 }
 HERE
 }
 
+say "AssemblyParam Methods:";
 foreach (@types)
 {
     say <<HERE;
-func (self *AssemblyInstance) Add${_}Param(name string, ptr *cip.$_) *param.AssemblyParam {
-  p := param.New${_}Param(name, ptr)
+func (self *AssemblyInstance) Add${_}Param(name string) *param.AssemblyParam {
+  p := param.New${_}Param(name)
   self.AddParam(p)
   return p
 }

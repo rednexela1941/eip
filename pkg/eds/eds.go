@@ -47,11 +47,6 @@ type (
 		RPI    *param.AssemblyParam
 		Config *param.AssemblyParam
 	}
-
-	edsWriter struct {
-		data     *edsData
-		template *template.Template
-	}
 )
 
 //go:embed template.eds.tmpl
@@ -61,6 +56,47 @@ var funcs = template.FuncMap{
 	"add": func(a, b int) int {
 		return a + b
 	},
+}
+
+var defaultCreateDate = time.Date(2016, 11, 8, 10, 15, 0, 0, time.UTC)
+
+func WriteEDS(w io.Writer, a *adapter.Adapter, init FileInitFunc) error {
+	url, err := url.Parse("https://github.com/rednexela1941/eip")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	header := &Header{
+		FileSection: FileSection{
+			DescText:         fmt.Sprintf("%s EtherNet/IP EDS File", a.Identity.ProductName),
+			CreateTime:       defaultCreateDate,
+			ModificationTime: time.Now(),
+			Revision:         a.Identity.Revision,
+			HomeURL:          url,
+		},
+		DeviceSection: DeviceSection{
+			VendorName:  "Default",
+			ProductType: "Generic Device",
+		},
+	}
+
+	if init != nil {
+		init(header)
+	}
+
+	data := &edsData{
+		Header:  header,
+		Adapter: a,
+	}
+
+	tmpl, err := template.New("edsfile").Funcs(funcs).Parse(templateStr)
+	if err != nil {
+		return err
+	}
+
+	data.init()
+
+	return tmpl.Execute(w, data)
 }
 
 /***
@@ -145,69 +181,23 @@ func (self *edsData) StandardClasses() []*adapter.Class {
 }
 
 func (self *edsData) init() {
-	rpi := param.NewUDINTParam("RPI", nil).SetHelpString(
+	rpi := param.NewUDINTParam("RPI").SetHelpString(
 		"Requested Packet Interval",
 	).SetUnitsString(
 		"Microseconds",
 	).SetMinString(
-		fmt.Sprintf("%d", 10*1000), // 10 millis
+		fmt.Sprintf("%d", self.Adapter.NetworkTickInterval/time.Microsecond), // 10 millis
 	).SetMaxString(
 		fmt.Sprintf("%d", 1000*1000), // 1 second
 	).SetDefaultValueString(
 		fmt.Sprintf("%d", 100*1000), // 100 millis
 	)
 
-	config := param.NewBYTEParam("Config Data", nil).SetHelpString(
+	config := param.NewBYTEParam("Config Data").SetHelpString(
 		"Config Data",
 	)
 	self.RPI = rpi
 	self.Config = config
 
 	self.ParamList() // to init the Index numbers
-}
-
-var defaultCreateDate = time.Date(2016, 11, 8, 10, 15, 0, 0, time.UTC)
-
-func NewEDSWriter(init FileInitFunc, a *adapter.Adapter) (io.WriterTo, error) {
-	url, _ := url.Parse("https://github.com/rednexela1941/eip")
-
-	header := &Header{
-		FileSection: FileSection{
-			DescText:         fmt.Sprintf("%s EtherNet/IP EDS File", a.Identity.ProductName),
-			CreateTime:       defaultCreateDate,
-			ModificationTime: time.Now(),
-			Revision:         a.Identity.Revision,
-			HomeURL:          url,
-		},
-		DeviceSection: DeviceSection{
-			VendorName:  "Default",
-			ProductType: "Generic Device",
-		},
-	}
-
-	if init != nil {
-		init(header)
-	}
-
-	data := &edsData{
-		Header:  header,
-		Adapter: a,
-	}
-
-	tmpl, err := template.New("edsfile").Funcs(funcs).Parse(templateStr)
-	if err != nil {
-		return nil, err
-	}
-
-	data.init()
-
-	return &edsWriter{
-		data:     data,
-		template: tmpl,
-	}, nil
-}
-
-func (self *edsWriter) WriteTo(w io.Writer) (int64, error) {
-	err := self.template.Execute(w, self.data)
-	return 0, err
 }

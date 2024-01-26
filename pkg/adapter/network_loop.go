@@ -1,7 +1,6 @@
 package adapter
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/rednexela1941/eip/pkg/cm"
@@ -10,17 +9,13 @@ import (
 
 // StartNetworkLoop
 // blocking function to run the EtherNet/IP server.
-func (self *Adapter) StartNetworkLoop(tick time.Duration) error {
-	if tick < 0 {
-		return fmt.Errorf("invalid tick time %d", tick)
-	}
-	self.networkTickInterval = tick
-
+func (self *Adapter) StartNetworkLoop() error {
 	for _, p := range self.listenerParams {
 		if err := self.ListenOn(p.addr, p.iface, p.pctx); err != nil {
 			return err
 		}
 	}
+	tick := self.NetworkTickInterval
 
 	for {
 		if err := self._CloseStaleConnections(); err != nil {

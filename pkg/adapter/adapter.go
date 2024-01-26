@@ -11,6 +11,10 @@ import (
 	"github.com/rednexela1941/eip/pkg/identity"
 )
 
+const (
+	DefaultNetworkTickInterval = 10 * time.Millisecond
+)
+
 type (
 	Adapter struct {
 		*identity.Identity
@@ -21,7 +25,7 @@ type (
 		AssemblyInstances []*AssemblyInstance
 
 		sessionHandleOffset encap.SessionHandle
-		networkTickInterval time.Duration
+		NetworkTickInterval time.Duration
 
 		listenerParams []listenParams
 	}
@@ -37,11 +41,20 @@ func New(ident *identity.Identity) *Adapter {
 	a.Connections = NewConnectionStore(32)
 	a.ConnectionPoints = make([]ConnectionPoint, 0, 2)
 	a.listenerParams = make([]listenParams, 0, 1)
+	a.NetworkTickInterval = DefaultNetworkTickInterval
 
 	a.InitDefaultIdentityObject()
 	a.InitDefaultMessageRouterObject()
 	a.InitDefaultConnectionManagerObject()
 	return a
+}
+
+func (self *Adapter) SetNetworkTickInterval(duration time.Duration) error {
+	if duration < 0 {
+		return fmt.Errorf("invalid duration %s", duration.String())
+	}
+	self.NetworkTickInterval = duration
+	return nil
 }
 
 func (self *_Adapter) Handle(c *RequestContext, p encap.Request) (encap.Reply, error) {

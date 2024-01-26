@@ -4,7 +4,6 @@ import (
 	"flag"
 	"log"
 	"os"
-	"time"
 
 	"github.com/rednexela1941/eip/pkg/eds"
 	"github.com/rednexela1941/eip/pkg/linux"
@@ -30,17 +29,13 @@ func main() {
 	}
 
 	if *edsFlag {
-		eds, err := eds.NewEDSWriter(nil, adapter)
-		if err != nil {
-			log.Fatal(err)
-		}
-		if _, err := eds.WriteTo(os.Stdout); err != nil {
+		if err := eds.WriteEDS(os.Stdout, adapter, nil); err != nil {
 			log.Fatal(err)
 		}
 		return
 	}
 
-	if err := adapter.StartNetworkLoop(10 * time.Millisecond); err != nil {
+	if err := adapter.StartNetworkLoop(); err != nil {
 		log.Fatal(err)
 	}
 }
