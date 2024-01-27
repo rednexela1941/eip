@@ -29,10 +29,12 @@ type AssemblyParam struct {
 	onSet OnSetFunc
 }
 
-type OnGetFunc func(w bbuf.Writer) error
-type OnSetFunc func(r bbuf.Reader) error
+type (
+	OnGetFunc func(w bbuf.Writer) error
+	OnSetFunc func(w bbuf.Reader) error
+)
 
-// WriteTo: for Get data (both IO connections and Get Attribute services).
+// WriteTo for Get data (both IO connections and Get Attribute services).
 func (self *AssemblyParam) WriteTo(w bbuf.Writer) error {
 	if self.onGet == nil {
 		return fmt.Errorf("cannot get %s", self.Name)
@@ -40,7 +42,7 @@ func (self *AssemblyParam) WriteTo(w bbuf.Writer) error {
 	return self.onGet(w)
 }
 
-// ReadFrom: for Set data (both IO connection and SetAttribute services).
+// ReadFrom for Set data (both IO connection and SetAttribute services).
 func (self *AssemblyParam) ReadFrom(r bbuf.Reader) error {
 	if self.onSet == nil {
 		return fmt.Errorf("cannot set %s", self.Name)
@@ -87,11 +89,8 @@ func (self *AssemblyParam) GetDefaultValueString() string {
 	return self.DefaultValueString
 }
 
-func _NewDefaultParam(name string, dataType DataType) *AssemblyParam {
-	return &AssemblyParam{
-		Name:     name,
-		DataType: dataType,
-	}
+func (self *AssemblyParam) GetDescriptorString() string {
+	return fmt.Sprintf("0x%04X", self.Descriptor)
 }
 
 func (self *AssemblyParam) OnGet(fn OnGetFunc) *AssemblyParam {
@@ -104,62 +103,9 @@ func (self *AssemblyParam) OnSet(fn OnSetFunc) *AssemblyParam {
 	return self
 }
 
-func NewBOOLParam(name string) *AssemblyParam {
-	return _NewDefaultParam(name, BOOL)
-}
-
-func NewSINTParam(name string) *AssemblyParam {
-	return _NewDefaultParam(name, SINT)
-}
-
-func NewINTParam(name string) *AssemblyParam {
-	return _NewDefaultParam(name, INT)
-}
-
-func NewDINTParam(name string) *AssemblyParam {
-	return _NewDefaultParam(name, DINT)
-}
-
-func NewLINTParam(name string) *AssemblyParam {
-	return _NewDefaultParam(name, LINT)
-}
-
-func NewUSINTParam(name string) *AssemblyParam {
-	return _NewDefaultParam(name, USINT)
-}
-
-func NewUINTParam(name string) *AssemblyParam {
-	return _NewDefaultParam(name, UINT)
-}
-
-func NewUDINTParam(name string) *AssemblyParam {
-	return _NewDefaultParam(name, UDINT)
-}
-
-func NewULINTParam(name string) *AssemblyParam {
-	return _NewDefaultParam(name, ULINT)
-}
-
-func NewBYTEParam(name string) *AssemblyParam {
-	return _NewDefaultParam(name, BYTE)
-}
-
-func NewWORDParam(name string) *AssemblyParam {
-	return _NewDefaultParam(name, WORD)
-}
-
-func NewDWORDParam(name string) *AssemblyParam {
-	return _NewDefaultParam(name, DWORD)
-}
-
-func NewLWORDParam(name string) *AssemblyParam {
-	return _NewDefaultParam(name, LWORD)
-}
-
-func NewREALParam(name string) *AssemblyParam {
-	return _NewDefaultParam(name, REAL)
-}
-
-func NewLREALParam(name string) *AssemblyParam {
-	return _NewDefaultParam(name, LREAL)
+func NewDefaultParam(name string, dataType DataType) *AssemblyParam {
+	return &AssemblyParam{
+		Name:     name,
+		DataType: dataType,
+	}
 }

@@ -30,7 +30,7 @@ foreach (@types)
 {
     say <<HERE;
 func New${_}Param(name string) *AssemblyParam {
-	return _NewDefaultParam(name, $_)
+	return NewDefaultParam(name, $_)
 }
 HERE
 }
@@ -39,11 +39,18 @@ say "AssemblyParam Methods:";
 foreach (@types)
 {
     say <<HERE;
-func (self *AssemblyInstance) Add${_}Param(name string) *param.AssemblyParam {
-  p := param.New${_}Param(name)
-  self.AddParam(p)
-  return p
+func (self *AssemblyInstance) Add${_}Param(name string) *ElementaryParam[cip.${_}] {
+	ep := _NewElementaryParam[cip.${_}](name, param.${_})
+	self.AddParam(ep.AssemblyParam)
+	return ep
 }
 HERE
 
 }
+
+# foreach (@types) {
+# 	say <<HERE;
+# case ${_}Code:
+# 	return ${_}Size
+# HERE
+# }

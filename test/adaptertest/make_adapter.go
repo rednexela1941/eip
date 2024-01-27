@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/rednexela1941/eip/pkg/adapter"
-	"github.com/rednexela1941/eip/pkg/bbuf"
 	"github.com/rednexela1941/eip/pkg/cip"
 	"github.com/rednexela1941/eip/pkg/cm"
 	"github.com/rednexela1941/eip/pkg/identity"
@@ -46,21 +45,19 @@ func testSetup() {
 func makeDefaultAssembly(inst *adapter.AssemblyInstance, size int) {
 	for i := 0; i < size; i++ {
 		name := fmt.Sprintf("Inst %d Param %d", inst.InstanceID, i)
-		inst.AddBOOLParam(name).OnGet(
-			func(w bbuf.Writer) error {
-				w.Wl(true)
-				return w.Error()
-			},
-		).OnSet(func(r bbuf.Reader) error {
-			var dummy cip.BOOL
-			r.Rl(&dummy)
-			return r.Error()
+
+		inst.AddBOOLParam(name).SetHelpString(
+			"help string here...",
+		).OnGet(
+			func() cip.BOOL { return true },
+		).OnSet(func(v cip.BOOL) {
+			fmt.Printf("%s set to %t\n", name, v)
 		})
+
 	}
 }
 
 func InitAssemblies(a *adapter.Adapter) {
-
 	inputAssm := a.AddAssemblyInstance("Input Assembly", 100)
 	makeDefaultAssembly(inputAssm, 178)
 

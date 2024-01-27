@@ -8,14 +8,10 @@ import (
 	"github.com/rednexela1941/eip/pkg/cip"
 )
 
-//go:generate stringer -type=DataTypeCode
-
-// DataType codes for EDS.
-// See Volume 1: Table C-6.1
-type DataTypeCode cip.USINT
-
 type DataType struct {
-	Code DataTypeCode
+	// DataType codes for EDS.
+	// See Volume 1: Table C-6.1
+	Code cip.TypeCode
 	Size cip.UINT
 }
 
@@ -23,53 +19,30 @@ func (self *DataType) CodeString() string {
 	return fmt.Sprintf("0x%02X", int(self.Code))
 }
 
-const (
-	UTIMECode DataTypeCode = 0xC0
-	BOOLCode  DataTypeCode = 0xC1
-
-	SINTCode DataTypeCode = 0xC2
-	INTCode  DataTypeCode = 0xC3
-	DINTCode DataTypeCode = 0xC4
-	LINTCode DataTypeCode = 0xC5
-
-	USINTCode DataTypeCode = 0xC6
-	UINTCode  DataTypeCode = 0xC7
-	UDINTCode DataTypeCode = 0xC8
-	ULINTCode DataTypeCode = 0xC9
-
-	REALCode  DataTypeCode = 0xCA
-	LREALCode DataTypeCode = 0xCB
-
-	BYTECode  DataTypeCode = 0xD1
-	WORDCode  DataTypeCode = 0xD2
-	DWORDCode DataTypeCode = 0xD3
-	LWORDCode DataTypeCode = 0xD4
-)
-
 var (
 	// BOOL = DataType{Code: BOOLCode, Size: cip.UINT(cip.BOOLSize)}
-	BOOL = NewDataType(BOOLCode, cip.BOOLSize)
+	BOOL = NewDataType(cip.BOOLCode, cip.BOOLSize)
 
-	SINT = NewDataType(SINTCode, cip.SINTSize)
-	INT  = NewDataType(INTCode, cip.INTSize)
-	DINT = NewDataType(DINTCode, cip.DINTSize)
-	LINT = NewDataType(LINTCode, cip.LINTSize)
+	SINT = NewDataType(cip.SINTCode, cip.SINTSize)
+	INT  = NewDataType(cip.INTCode, cip.INTSize)
+	DINT = NewDataType(cip.DINTCode, cip.DINTSize)
+	LINT = NewDataType(cip.LINTCode, cip.LINTSize)
 
-	USINT = NewDataType(USINTCode, cip.USINTSize)
-	UINT  = NewDataType(UINTCode, cip.UINTSize)
-	UDINT = NewDataType(UDINTCode, cip.UDINTSize)
-	ULINT = NewDataType(ULINTCode, cip.ULINTSize)
+	USINT = NewDataType(cip.USINTCode, cip.USINTSize)
+	UINT  = NewDataType(cip.UINTCode, cip.UINTSize)
+	UDINT = NewDataType(cip.UDINTCode, cip.UDINTSize)
+	ULINT = NewDataType(cip.ULINTCode, cip.ULINTSize)
 
-	BYTE  = NewDataType(BYTECode, cip.BYTESize)
-	WORD  = NewDataType(WORDCode, cip.WORDSize)
-	DWORD = NewDataType(DWORDCode, cip.DWORDSize)
-	LWORD = NewDataType(LWORDCode, cip.LWORDSize)
+	BYTE  = NewDataType(cip.BYTECode, cip.BYTESize)
+	WORD  = NewDataType(cip.WORDCode, cip.WORDSize)
+	DWORD = NewDataType(cip.DWORDCode, cip.DWORDSize)
+	LWORD = NewDataType(cip.LWORDCode, cip.LWORDSize)
 
-	REAL  = NewDataType(REALCode, cip.REALSize)
-	LREAL = NewDataType(LREALCode, cip.LREALSize)
+	REAL  = NewDataType(cip.REALCode, cip.REALSize)
+	LREAL = NewDataType(cip.LREALCode, cip.LREALSize)
 )
 
-func NewDataType(code DataTypeCode, size int) DataType {
+func NewDataType(code cip.TypeCode, size int) DataType {
 	return DataType{Code: code, Size: cip.UINT(size)}
 }
 

@@ -29,7 +29,7 @@
 	Param{{ $p.Index }} =
 		0, 	$ reserved (0)
 		,, 	$ link path size, link path
-		0x0000, 	$ descriptor
+		{{ $p.GetDescriptorString }}, 	$ descriptor
 		{{ $p.DataType.CodeString }}, 	$ data type ({{ $p.DataType.String }})
 		{{ $p.DataType.Size }}, 	$ data size (bytes)
 		"{{ $p.Name }}", 	$ name
