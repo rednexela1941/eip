@@ -253,12 +253,19 @@ func (self *Adapter) _StartUDPIOServer(localAddr *net.UDPAddr, l *ipv4.PacketCon
 
 		lastEncapSeq := conn.OtoTEncapsulationSequenceNumber
 		currentEncapSeq := addrItem.GetEncapsulationSequenceNumber()
+		haveFirstEncapSeqCnt := conn.FirstOtoTEncapsulationSequenceNumberReceived
 
-		// TODO: check that this sequence count calculation is good.
-		if lastEncapSeq > 0 && int32(currentEncapSeq-lastEncapSeq) <= 0 {
-			self.Logger.Println("sequence count comes before", currentEncapSeq, lastEncapSeq)
+		if haveFirstEncapSeqCnt && !seqGT32(currentEncapSeq, lastEncapSeq) {
+			self.Logger.Printf(
+				"encapsulation sequence count invalid last=%d, rxd=%d\n",
+				lastEncapSeq,
+				currentEncapSeq,
+			)
 			continue
 		}
+
+		conn.FirstOtoTEncapsulationSequenceNumberReceived = true
+
 		cp := conn.Point
 		if cp == nil {
 			self.Logger.Println("connection point is nil")

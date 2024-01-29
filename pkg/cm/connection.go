@@ -18,14 +18,15 @@ type ConnectionTimestamp struct {
 
 type Connection struct {
 	SharedForwardOpenRequest
-	SessionHandle                   encap.SessionHandle // optional, for class 3 conns
-	OtoTTimestamp                   ConnectionTimestamp
-	TtoOTimestamp                   ConnectionTimestamp
-	OtoTSequenceNumber              cip.UINT
-	OtoTEncapsulationSequenceNumber cip.UDINT
-	LastSentPacket                  encap.SendUnitDataReply
-	TtoOSequenceNumber              cip.UINT
-	TtoOEncapsulationSequenceNumber cip.UDINT
+	SessionHandle                                encap.SessionHandle // optional, for class 3 conns
+	OtoTTimestamp                                ConnectionTimestamp
+	TtoOTimestamp                                ConnectionTimestamp
+	OtoTSequenceNumber                           cip.UINT
+	FirstOtoTEncapsulationSequenceNumberReceived bool
+	OtoTEncapsulationSequenceNumber              cip.UDINT
+	LastSentPacket                               encap.SendUnitDataReply
+	TtoOSequenceNumber                           cip.UINT
+	TtoOEncapsulationSequenceNumber              cip.UDINT
 }
 
 func (self *Connection) String() string {

@@ -71,10 +71,14 @@ func (self *Connection) readOtoTIODataHeader(r bbuf.Reader) error {
 	if tc == cm.Class1 {
 		seq := cip.UINT(0)
 		r.Rl(&seq)
-		if int16(seq-self.OtoTSequenceNumber) > 0 {
+		if setGT16(seq, self.OtoTSequenceNumber) {
 			self.OtoTSequenceNumber = seq // update sequence number
 		} else {
-			return fmt.Errorf("sequence count is less", seq, self.OtoTSequenceNumber)
+			return fmt.Errorf(
+				"no new data: sequence count last=%d rxd=%d",
+				self.OtoTSequenceNumber,
+				seq,
+			)
 		}
 	}
 
